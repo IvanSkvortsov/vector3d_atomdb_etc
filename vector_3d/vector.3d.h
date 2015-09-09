@@ -121,7 +121,7 @@ vector_3d<T> operator*( vector_3d<T> const & a, T const & b )
 }
 
 template<class T>
-vector_3d<T> operator+( T const & a, vector_3d<T> const & b )
+vector_3d<T> operator*( T const & a, vector_3d<T> const & b )
 {
 	vector_3d<T> c( b );
 	c *= a;
