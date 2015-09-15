@@ -1,0 +1,6 @@
+  4
+atom         x         y         z      color  color_light  
+  Pd     0.000    -1.671   0.00000   0x0000aa     0x8989ff
+  Pd     1.671     0.000   0.00000   0x0000aa     0x8989ff
+   C     3.471     0.000   0.00000   0xff0000     0xff8989
+   O     4.607     0.000   0.00000   0xdddd00     0xffff89

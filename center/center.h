@@ -29,6 +29,8 @@ struct center
 	std::size_t size()const{return sz;}
 	value_type & operator[](int i){return r[i];}
 	value_type const & operator[](int i)const{return r[i];}
+	value_type * data(){return r;}
+	value_type const * data()const{return r;}
 	void pub_print()const
 	{
 #ifdef  __center_print__

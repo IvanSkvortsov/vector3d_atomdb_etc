@@ -19,17 +19,26 @@ struct vector_3d : public center_3d<T>
 	~vector_3d(){}
 	T sqr_len()const{ return this->r[0] * this->r[0] + this->r[1] * this->r[1] + this->r[2] * this->r[2]; }
 	T len()const{ return std::sqrt( this->sqr_len() ); }
-	void normalize()
+	T normalize()
 	{
-		T __sqr_len = this->sqr_len(), norm_c = 1/(__sqr_len ? std::sqrt( __sqr_len ) : 1);
+		T __sqr_len = this->sqr_len(), __len = (__sqr_len ? std::sqrt( __sqr_len ) : 1), norm_c = 1/__len;
 		for(int i = 0; i < 3; ++i) this->r[i] *= norm_c;
+		return __len;
+	}
+	T normalize(vector_3d<T> & v)const
+	{
+		T __sqr_len = this->sqr_len(), __len = (__sqr_len ? std::sqrt( __sqr_len ) : 1), norm_c = 1/__len;
+		for(int i = 0; i < 3; ++i) v[i] = this->r[i] * norm_c;
+		return __len;
 	}
 	void init_cosine(vector3d_cosine<T> & v3)const
 	{
-		v3.cos_t = this->r[2] / this->len();
+		T tmp = this->len();
+		v3.cos_t = this->r[2] / tmp;
 		v3.sin_t = std::sqrt(1 - v3.cos_t * v3.cos_t);
-		v3.cos_p = this->r[0] / v3.sin_t;
-		v3.sin_p = this->r[1] / v3.sin_t;
+		tmp *= v3.sin_t;
+		v3.cos_p = this->r[0] / tmp;
+		v3.sin_p = this->r[1] / tmp;
 	}
 	T cos_theta()const
 	{
@@ -42,11 +51,11 @@ struct vector_3d : public center_3d<T>
 	}
 	T cos_phi()const
 	{
-		return this->r[0] / this->sin_theta();
+		return this->r[0] / (this->sin_theta() * this->len());
 	}
 	T sin_phi()const
 	{
-		return this->r[1] / this->sin_theta();
+		return this->r[1] / (this->sin_theta() * this->len());
 	}
 	vector_3d<T> & operator=(vector_3d<T> const & v)
 	{

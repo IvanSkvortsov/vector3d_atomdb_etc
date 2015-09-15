@@ -5,8 +5,9 @@
 #include<vector>
 #include"/home/Ivan/cpp/lib/aux.stdlib.h"
 #include<iostream>
+#include<iomanip>
 #include<fstream>
-#include<utility>
+#include"../color/color.h"
 
 struct atom_name : public std::vector<std::string>
 {
@@ -79,29 +80,42 @@ struct atom_name : public std::vector<std::string>
 	}
 };
 
-template<class T1, class T2>
-struct rad_name: public std::pair<T1, T2>
+template<class T>
+struct radius_name_color
 {
-	typedef typename T2::value_type str_type;
-	typedef typename T2::size_type  size_type;
-	T1 & radius(){return this->first;}
-	T1 radius(T1 const & radius_value){return this->first = radius_value;}
-	T1 const & radius()const{return this->first;}
-	size_type size()const{return this->second.size();}
-	void resize( size_type _size){this->second.resize( _size );}
-	T2 & name(){return this->second;}
-	void name(str_type const & name_value){this->second.add(name_value);}
-	T2 const & name()const{return this->second;}
-	str_type & name(size_type i){return this->second[i];}
-	str_type const & name(size_type i)const{return this->second[i];}
+	typedef T                     float_type;
+	typedef atom_name::value_type str_type;
+	typedef atom_name::size_type  size_type;
+	typedef color_rgb             color_type;
+	T _radius;
+	atom_name _name;
+	color_rgb _colorRGB;
+	// radius
+	float_type & radius(){return _radius;}
+	float_type const & radius()const{return _radius;}
+	float_type radius(float_type const & radius_value){return _radius = radius_value;}
+	// size
+	size_type size()const{return _name.size();}
+	void resize( size_type _size){_name.resize( _size );}
+	// name
+	atom_name & name(){return _name;}
+	atom_name const & name()const{return _name;}
+	void name(str_type const & name_value){_name.add(name_value);}
+	// str
+	str_type & name(size_type i){return _name[i];}
+	str_type const & name(size_type i)const{return _name[i];}
+	// color
+	color_type & colorRGB(){return _colorRGB;}
+	color_type const & colorRGB()const{return _colorRGB;}
+	void colorRGB(color_type const & color_value){ _colorRGB = color_value;}
 };
 
 template<class T>
 struct atom_db
 {
 	//std::vector<std::pair<T, atom_name> > m;
-	std::vector<rad_name<T, atom_name> > m;
-	typedef rad_name<T,atom_name>                                    value_type;
+	std::vector<radius_name_color<T> > m;
+	typedef radius_name_color<T>                                     value_type;
 	typedef typename std::vector<value_type>::allocator_type         allocator_type;
 	typedef typename std::vector<value_type>::const_reference        const_reference;
 	typedef typename std::vector<value_type>::reference              reference;
@@ -142,13 +156,13 @@ struct atom_db
 	{
 		const_pointer p = this->data();
 		for(int i = 0; i < this->size(); ++i)
-			if( p++->second.is_equal( name ) ) return i;
+			if( p++->name().is_equal( name ) ) return i;
 		return -1;
 	}
 	//
 	const_pointer data()const{return m.data();}
 	void resize(size_type _size){m.resize( _size );}
-	int import(char const * file)
+	int import_data(char const * file)
 	{
 		std::ifstream inp( file );
 		if( !inp.is_open() )
@@ -160,12 +174,12 @@ struct atom_db
 		inp >> sz;
 		this->resize( sz );
 		pointer p = this->data();
-		atom_name * ap = &p->second;
+		atom_name * ap = &p->name();
 		for(int i = 0; i < this->size(); ++i)
 		{
-			inp >> p->first;
+			inp >> p->radius();
 			inp >> sz;
-			ap = &p->second;
+			ap = &p->name();
 			ap->resize( sz );
 			for(int j = 0; j < ap->size(); ++j) inp >> (*ap)[j];
 			if( inp == 0 )
@@ -195,7 +209,7 @@ struct atom_db
 		for(int i = 0; i < this->size(); ++i)
 		{
 			inp >> sz;
-			ap = &p->second;
+			ap = &p->name();
 			ap->resize( sz );
 			//avp = ap->data();
 			//for(int j = 0; j < ap->size(); ++j) inp >> avp[j];
@@ -241,8 +255,7 @@ struct atom_db
 				std::cerr << "rad  : " << rad << std::endl;
 				return 3;
 			}
-			m[n].first = rad;
-			//m[n].radius( rad );
+			m[n].radius( rad );
 			++p;
 		}
 		return 0;
@@ -250,18 +263,18 @@ struct atom_db
 	int export_data(char const * file)const
 	{
 		std::ofstream out( file );
+		out.setf( std::ios::scientific );
+		int prec = 8, w = prec + 8;
+		out.precision( prec );
 		out << this->size() << std::endl;
 		const_pointer p = this->data();
 		for(int i = 0; i < this->size(); ++i)
 		{
-			//out << p->size() << ' ';
-			//for(int j = 0; j < p->size(); ++j)
-			//	out << p->name(j) << ' ';
-			//out << p->radius() << std::endl;
-			out << p->second.size() << ' ';
-			for(int j = 0; j < p->second.size(); ++j)
-				out << p->second[j] << ' ';
-			out << p->first << std::endl;
+			out << std::setw( w ) << p->radius() << ' ';
+			out << p->size() << ' ';
+			for(int j = 0; j < p->size(); ++j)
+				out << p->name(j) << ' ';
+			out << std::endl;
 			++p;
 		}
 		return 0;

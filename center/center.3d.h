@@ -28,5 +28,11 @@ struct center_3d : public center<T, 3>
 		this->center_type::operator=( v );
 		return *this;
 	}
+	T & x(){return this->r[0];}
+	T & y(){return this->r[1];}
+	T & z(){return this->r[2];}
+	T const & x()const{return this->r[0];}
+	T const & y()const{return this->r[1];}
+	T const & z()const{return this->r[2];}
 };
 #endif//__CENTER_3D_H__
